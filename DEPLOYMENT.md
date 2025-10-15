@@ -95,17 +95,20 @@ git push -u origin main
    
    Klik "Environment Variables" dan tambahkan:
 
-   ```env
-   DATABASE_URL=postgresql://username:password@ep-xxx.region.aws.neon.tech/kos_db?sslmode=require
-   
-   AUTH_SECRET=your-generated-secret-from-openssl
-   
-   AUTH_URL=https://your-project-name.vercel.app
-   
-   NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME=your_cloud_name
-   CLOUDINARY_API_KEY=your_api_key
-   CLOUDINARY_API_SECRET=your_api_secret
-   ```
+      ```env
+      DATABASE_URL="postgresql://username:password@your-neon-host.neon.tech/kos_db?sslmode=require"
+
+      NEXTAUTH_URL="https://your-project-name.vercel.app"
+      NEXTAUTH_SECRET="your-generated-secret-from-openssl"
+
+      NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME="your_cloud_name"
+      CLOUDINARY_API_KEY="your_api_key"
+      CLOUDINARY_API_SECRET="your_api_secret"
+      CLOUDINARY_URL="cloudinary://api_key:api_secret@cloud_name"
+
+      NEXT_PUBLIC_APP_NAME="Sistem Manajemen Kos"
+      NEXT_PUBLIC_APP_URL="https://your-project-name.vercel.app"
+      ```
 
    **PENTING:**
    - `DATABASE_URL` = Connection string dari Neon.tech
