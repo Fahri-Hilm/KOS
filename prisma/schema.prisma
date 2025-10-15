@@ -1,0 +1,206 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// Model untuk User/Admin
+model User {
+  id        String   @id @default(cuid())
+  email     String   @unique
+  name      String
+  password  String
+  role      UserRole @default(ADMIN)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@map("users")
+}
+
+enum UserRole {
+  ADMIN
+  PENYEWA
+}
+
+// Model untuk Penyewa (Tenant)
+model Penyewa {
+  id           String   @id @default(cuid())
+  nama         String
+  email        String   @unique
+  noHp         String
+  alamatAsal   String
+  tanggalLahir DateTime
+  pekerjaan    String?
+  fotoKtpUrl   String? // URL gambar KTP dari Cloudinary
+  ktpNumber    String? // Nomor KTP
+  status       StatusPenyewa @default(AKTIF)
+  tanggalMasuk DateTime @default(now())
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  // Relations
+  kamar        Kamar[]
+  pembayaran   Pembayaran[]
+  pengaduan    Pengaduan[]
+
+  @@map("penyewa")
+}
+
+enum StatusPenyewa {
+  AKTIF
+  KELUAR
+  SUSPEND
+}
+
+// Model untuk Kamar
+model Kamar {
+  id            String       @id @default(cuid())
+  nomorKamar    String       @unique
+  lantai        Int
+  tipe          TipeKamar
+  hargaPerBulan Decimal      @db.Decimal(10, 2)
+  fasilitas     String[] // Array untuk menyimpan list fasilitas
+  status        StatusKamar  @default(TERSEDIA)
+  kapasitas     Int          @default(1)
+  luasKamar     Decimal?     @db.Decimal(5, 2) // dalam m²
+  deskripsi     String?
+  fotoUrl       String[] // Array URL foto kamar
+  createdAt     DateTime     @default(now())
+  updatedAt     DateTime     @updatedAt
+
+  // Relations
+  penyewaId     String?
+  penyewa       Penyewa?     @relation(fields: [penyewaId], references: [id], onDelete: SetNull)
+  pembayaran    Pembayaran[]
+  perawatan     Perawatan[]
+
+  @@map("kamar")
+}
+
+enum TipeKamar {
+  STANDAR
+  PREMIUM
+  VIP
+}
+
+enum StatusKamar {
+  TERSEDIA
+  TERISI
+  MAINTENANCE
+  BOOKING
+}
+
+// Model untuk Pembayaran
+model Pembayaran {
+  id              String          @id @default(cuid())
+  nomorInvoice    String          @unique
+  tanggalBayar    DateTime        @default(now())
+  bulanPembayaran String // Format: "2024-01" untuk Januari 2024
+  jumlah          Decimal         @db.Decimal(10, 2)
+  metodePembayaran MetodePembayaran
+  status          StatusPembayaran @default(PENDING)
+  keterangan      String?
+  buktiUrl        String? // URL bukti transfer
+  jatuhTempo      DateTime
+  createdAt       DateTime        @default(now())
+  updatedAt       DateTime        @updatedAt
+
+  // Relations
+  penyewaId       String
+  penyewa         Penyewa         @relation(fields: [penyewaId], references: [id], onDelete: Cascade)
+  kamarId         String
+  kamar           Kamar           @relation(fields: [kamarId], references: [id], onDelete: Cascade)
+
+  @@index([penyewaId])
+  @@index([kamarId])
+  @@index([bulanPembayaran])
+  @@map("pembayaran")
+}
+
+enum MetodePembayaran {
+  TUNAI
+  TRANSFER
+  EWALLET
+  DEBIT
+}
+
+enum StatusPembayaran {
+  PENDING
+  LUNAS
+  TELAT
+  BATAL
+}
+
+// Model untuk Pengaduan/Perawatan
+model Pengaduan {
+  id          String          @id @default(cuid())
+  judul       String
+  deskripsi   String
+  kategori    KategoriPengaduan
+  prioritas   PrioritasPengaduan @default(SEDANG)
+  status      StatusPengaduan @default(BARU)
+  fotoUrl     String[] // Array URL foto pengaduan
+  tanggapan   String?
+  biayaPerbaikan Decimal? @db.Decimal(10, 2)
+  createdAt   DateTime        @default(now())
+  updatedAt   DateTime        @updatedAt
+  diselesaikanPada DateTime?
+
+  // Relations
+  penyewaId   String
+  penyewa     Penyewa         @relation(fields: [penyewaId], references: [id], onDelete: Cascade)
+
+  @@index([penyewaId])
+  @@index([status])
+  @@map("pengaduan")
+}
+
+enum KategoriPengaduan {
+  LISTRIK
+  AIR
+  KAMAR_MANDI
+  FURNITURE
+  AC
+  KEBERSIHAN
+  KEAMANAN
+  LAINNYA
+}
+
+enum PrioritasPengaduan {
+  RENDAH
+  SEDANG
+  TINGGI
+  DARURAT
+}
+
+enum StatusPengaduan {
+  BARU
+  DIPROSES
+  SELESAI
+  DITOLAK
+}
+
+// Model untuk Perawatan Rutin Kamar
+model Perawatan {
+  id              String   @id @default(cuid())
+  tanggalPerawatan DateTime @default(now())
+  jenisPerawatan  String
+  deskripsi       String?
+  biaya           Decimal  @db.Decimal(10, 2)
+  teknisi         String?
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  // Relations
+  kamarId         String
+  kamar           Kamar    @relation(fields: [kamarId], references: [id], onDelete: Cascade)
+
+  @@index([kamarId])
+  @@map("perawatan")
+}
