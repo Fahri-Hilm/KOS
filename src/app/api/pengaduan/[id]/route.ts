@@ -5,10 +5,10 @@ import { errorResponse, successResponse } from '@/lib/api'
 // GET /api/pengaduan/[id] - Get pengaduan detail
 export async function GET(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  context: any
 ) {
   try {
-    const pengaduanId = params.id
+    const { id: pengaduanId } = context.params;
 
     const pengaduan = await prisma.pengaduan.findUnique({
       where: { id: pengaduanId },
@@ -47,10 +47,10 @@ export async function GET(
 // PUT /api/pengaduan/[id] - Update pengaduan
 export async function PUT(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  context: any
 ) {
   try {
-    const pengaduanId = params.id
+    const pengaduanId = context.params.id;
     const body = await request.json()
 
     const { status, tanggapan, biayaPerbaikan, diselesaikanPada } = body
@@ -119,10 +119,10 @@ export async function PUT(
 // DELETE /api/pengaduan/[id] - Delete pengaduan
 export async function DELETE(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  context: any
 ) {
   try {
-    const pengaduanId = params.id
+    const pengaduanId = context.params.id;
 
     // Check if pengaduan exists
     const existingPengaduan = await prisma.pengaduan.findUnique({
