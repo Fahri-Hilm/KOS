@@ -128,7 +128,7 @@ export async function PUT(
             nomorKamar: true,
             tipe: true,
             lantai: true,
-            harga: true,
+            hargaPerBulan: true,
           }
         }
       }
