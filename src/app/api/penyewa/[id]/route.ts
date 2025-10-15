@@ -7,17 +7,14 @@ import {
   parseBody,
 } from '@/lib/api'
 
-interface RouteParams {
-  params: {
-    id: string
-  }
-}
+// ...existing code...
 
 // GET - Get single penyewa by ID
-export async function GET(request: NextRequest, { params }: RouteParams) {
+export async function GET(request: NextRequest, context: any) {
   try {
+    const id = context.params.id;
     const penyewa = await prisma.penyewa.findUnique({
-      where: { id: params.id },
+      where: { id },
       include: {
         kamar: {
           select: {
@@ -51,12 +48,12 @@ export async function GET(request: NextRequest, { params }: RouteParams) {
 }
 
 // PUT - Update penyewa
-export async function PUT(request: NextRequest, { params }: RouteParams) {
+export async function PUT(request: NextRequest, context: any) {
   try {
     const body = await parseBody(request)
-
+    const id = context.params.id;
     const penyewa = await prisma.penyewa.update({
-      where: { id: params.id },
+      where: { id },
       data: {
         nama: body.nama,
         email: body.email,
@@ -77,10 +74,11 @@ export async function PUT(request: NextRequest, { params }: RouteParams) {
 }
 
 // DELETE - Delete penyewa
-export async function DELETE(request: NextRequest, { params }: RouteParams) {
+export async function DELETE(request: NextRequest, context: any) {
   try {
+    const id = context.params.id;
     await prisma.penyewa.delete({
-      where: { id: params.id },
+      where: { id },
     })
 
     return successResponse('Penyewa deleted successfully', null, 200)
