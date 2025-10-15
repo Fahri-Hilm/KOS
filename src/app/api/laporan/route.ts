@@ -240,7 +240,7 @@ export async function GET(request: NextRequest) {
         total: totalRevenue._sum.jumlah || 0,
         transactionCount: totalRevenue._count.id || 0,
         average: totalRevenue._count.id
-          ? (totalRevenue._sum.jumlah || 0) / totalRevenue._count.id
+          ? (Number(totalRevenue._sum.jumlah) || 0) / Number(totalRevenue._count.id)
           : 0,
       },
       occupancy: {
