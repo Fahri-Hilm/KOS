@@ -7,14 +7,8 @@ import {
   parseBody,
 } from '@/lib/api'
 
-interface RouteParams {
-  params: {
-    id: string
-  }
-}
-
 // GET - Get single kamar by ID
-export async function GET(request: NextRequest, { params }: RouteParams) {
+export async function GET(request: NextRequest, { params }: { params: { id: string } }) {
   try {
     const kamar = await prisma.kamar.findUnique({
       where: { id: params.id },
@@ -42,7 +36,7 @@ export async function GET(request: NextRequest, { params }: RouteParams) {
 }
 
 // PUT - Update kamar
-export async function PUT(request: NextRequest, { params }: RouteParams) {
+export async function PUT(request: NextRequest, { params }: { params: { id: string } }) {
   try {
     const body = await parseBody(request)
 
@@ -76,7 +70,7 @@ export async function PUT(request: NextRequest, { params }: RouteParams) {
 }
 
 // DELETE - Delete kamar
-export async function DELETE(request: NextRequest, { params }: RouteParams) {
+export async function DELETE(request: NextRequest, { params }: { params: { id: string } }) {
   try {
     await prisma.kamar.delete({
       where: { id: params.id },
