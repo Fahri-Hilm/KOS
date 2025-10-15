@@ -8,10 +8,11 @@ import {
 } from '@/lib/api'
 
 // GET - Get single kamar by ID
-export async function GET(request: NextRequest, { params }: { params: { id: string } }) {
+export async function GET(request: NextRequest, { params }: any) {
+  const { id } = params;
   try {
     const kamar = await prisma.kamar.findUnique({
-      where: { id: params.id },
+      where: { id },
       include: {
         penyewa: true,
         pembayaran: {
@@ -36,7 +37,8 @@ export async function GET(request: NextRequest, { params }: { params: { id: stri
 }
 
 // PUT - Update kamar
-export async function PUT(request: NextRequest, { params }: { params: { id: string } }) {
+export async function PUT(request: NextRequest, { params }: any) {
+  const { id } = params;
   try {
     const body = await parseBody(request)
 
@@ -59,7 +61,7 @@ export async function PUT(request: NextRequest, { params }: { params: { id: stri
     }
 
     const kamar = await prisma.kamar.update({
-      where: { id: params.id },
+      where: { id },
       data: updateData,
     })
 
@@ -70,10 +72,11 @@ export async function PUT(request: NextRequest, { params }: { params: { id: stri
 }
 
 // DELETE - Delete kamar
-export async function DELETE(request: NextRequest, { params }: { params: { id: string } }) {
+export async function DELETE(request: NextRequest, { params }: any) {
+  const { id } = params;
   try {
     await prisma.kamar.delete({
-      where: { id: params.id },
+      where: { id },
     })
 
     return successResponse('Kamar deleted successfully', null, 200)
